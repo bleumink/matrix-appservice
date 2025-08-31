@@ -20,9 +20,8 @@ experimental_features:
   msc3202_transaction_extensions: true
 ```
 
-The appservice registration file needs to following flags set:
+The [appservice registration file](https://github.com/bleumink/matrix-appservice/blob/main/examples/registration.yaml) needs to following flags set:
 ```yaml
-rate_limited: false
 de.sorunome.msc2409.push_ephemeral: true
 org.matrix.msc3202: true
 io.element.msc4190: true
@@ -72,12 +71,15 @@ async fn on_room_member(
 }
 ```
 
+Example configuration file can be found [here](https://github.com/bleumink/matrix-appservice/blob/main/examples/config.yaml). Extra fields can be added to the configuration. These can be retrieved using the ```appservice.get_user_fields()``` method.
+
 ## :construction: Work in progress
 This project is obviously not done; the following is on the to-do list:
 - [ ] Documentation
 - [ ] Tests
 - [ ] Implementing the full Matrix Application Service API
 - [ ] Postgres support for state and crypto storage
+- [ ] Higher level API for bridges
 - [ ] Etc...
 
 Much of the project can also be deprecated by implementing the MSCs mentioned above in the Matrix Rust SDK to provide device masquerading support. I did not know enough about Rust when starting this project to make a sensible contribution there. Might revisit. You would still need to bring your own webserver and handle transactions.
