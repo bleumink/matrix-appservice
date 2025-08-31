@@ -1,0 +1,138 @@
+use std::{
+    collections::{BTreeMap, HashMap},
+    net::IpAddr,
+};
+
+use matrix_sdk::{
+    ServerName,
+    ruma::{
+        OneTimeKeyAlgorithm, OwnedEventId, OwnedRoomId, OwnedUserId, UInt,
+        api::client::{device::Device, sync::sync_events::DeviceLists},
+        events::{AnySyncEphemeralRoomEvent, AnySyncTimelineEvent, AnyToDeviceEvent},
+        presence::PresenceState,
+        serde::Raw,
+    },
+};
+use serde::{Deserialize, Serialize};
+use url::Url;
+
+#[derive(Copy, Clone)]
+pub struct NoState;
+
+#[derive(Clone)]
+pub struct State<S>(pub S);
+
+#[derive(Deserialize)]
+pub struct Empty {}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Homeserver {
+    pub server_name: Box<ServerName>,
+    pub url: Url,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Appservice {
+    pub url: Url,
+    pub bind_ip: IpAddr,
+    pub port: u16,
+    pub id: String,
+    pub username: String,
+    pub displayname: String,
+    pub as_token: String,
+    pub hs_token: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Database {
+    pub path: String,
+    pub passphrase: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Config {
+    pub homeserver: Homeserver,
+    pub appservice: Appservice,
+    pub database: Database,
+    #[serde(flatten)]
+    pub(crate) user_fields: HashMap<serde_yaml::Value, serde_yaml::Value>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct DeviceList {
+    pub changed: Vec<String>,
+    pub left: Vec<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct JoinedMembersResponse {
+    pub joined: HashMap<OwnedUserId, Profile>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SendResponse {
+    pub event_id: OwnedEventId,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Transaction {
+    pub events: Vec<Raw<AnySyncTimelineEvent>>,
+    #[serde(alias = "de.sorunome.msc2409.ephemeral")]
+    pub ephemeral: Vec<Raw<AnySyncEphemeralRoomEvent>>,
+    #[serde(alias = "de.sorunome.msc2409.to_device")]
+    pub to_device: Vec<Raw<AnyToDeviceEvent>>,
+    #[serde(alias = "org.matrix.msc3202.device_lists")]
+    pub device_lists: Option<DeviceLists>,
+    #[serde(alias = "org.matrix.msc3202.device_one_time_keys_count")]
+    pub device_one_time_keys_count: Option<HashMap<String, HashMap<String, BTreeMap<OneTimeKeyAlgorithm, UInt>>>>,
+    #[serde(alias = "org.matrix.msc3202.device_unused_fallback_key_types")]
+    pub device_unused_fallback_key_types: Option<HashMap<String, HashMap<String, Vec<OneTimeKeyAlgorithm>>>>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct JoinedRoomResponse {
+    pub joined_rooms: Vec<OwnedRoomId>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct MessagesResponse {
+    pub chunk: Vec<Raw<AnySyncTimelineEvent>>,
+    pub end: Option<String>,
+    pub start: String,
+    pub state: Option<Vec<Raw<AnySyncTimelineEvent>>>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Devices {
+    pub devices: Vec<Device>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Ping {
+    pub transaction_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PingResponse {
+    pub duration_ms: u32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Presence {
+    pub presence: PresenceState,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status_msg: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct CreateDeviceRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub display_name: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Profile {
+    pub avatar_url: Option<Url>,
+    #[serde(alias = "display_name")]
+    pub displayname: Option<String>,
+}
