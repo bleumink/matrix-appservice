@@ -30,9 +30,9 @@ io.element.msc4190: true
 
 The appservice can then be created as follows:
 ```rust
-#[tokio::main]
 use matrix_appservice::{ApplicationService, ApplicationServiceBuilder, EventContext};
 
+#[tokio::main]
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt::init();
     let cli = Cli::parse();
