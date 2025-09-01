@@ -4,14 +4,14 @@ pub struct NoConfig;
 
 pub struct ApplicationServiceBuilder<C = NoConfig, S = NoState> {
     config_path: C,
-    state: S,    
+    state: S,
 }
 
 impl ApplicationServiceBuilder<NoConfig, NoState> {
     pub fn new() -> Self {
         Self {
             config_path: NoConfig,
-            state: NoState,            
+            state: NoState,
         }
     }
 }
@@ -23,7 +23,7 @@ impl<C> ApplicationServiceBuilder<C, NoState> {
     {
         ApplicationServiceBuilder {
             config_path: self.config_path,
-            state: State(state),            
+            state: State(state),
         }
     }
 }
@@ -38,7 +38,7 @@ impl<S> ApplicationServiceBuilder<NoConfig, S> {
 }
 
 impl<S> ApplicationServiceBuilder<String, S> {
-    fn read_config(&self) -> Result<Config> {        
+    fn read_config(&self) -> Result<Config> {
         let file = std::fs::File::open(&self.config_path).map_err(|error| {
             tracing::error!("Unable to open file {}: {}", &self.config_path, error);
             error
@@ -59,7 +59,7 @@ impl ApplicationServiceBuilder<String, NoState> {
         let appservice = ApplicationService::new(config).await?;
 
         Ok(appservice)
-    }    
+    }
 }
 
 impl<S: Send + Sync + Clone + 'static> ApplicationServiceBuilder<String, State<S>> {

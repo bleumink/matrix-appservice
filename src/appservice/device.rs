@@ -245,7 +245,11 @@ impl Device {
         parse_response(response).await
     }
 
-    pub async fn send_message(self: &Arc<Self>, room_id: &RoomId, content: RoomMessageEventContent) -> Result<OwnedEventId> {
+    pub async fn send_message(
+        self: &Arc<Self>,
+        room_id: &RoomId,
+        content: RoomMessageEventContent,
+    ) -> Result<OwnedEventId> {
         let appservice = self.user()?.appservice()?;
         let room = match appservice.get_room(room_id).await {
             Some(room) => room.kind(),

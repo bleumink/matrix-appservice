@@ -58,6 +58,45 @@ pub struct Config {
     pub(crate) user_fields: HashMap<serde_yaml::Value, serde_yaml::Value>,
 }
 
+#[derive(Debug, Serialize)]
+pub struct Registration {
+    pub id: String,
+    pub url: Url,
+    pub as_token: String,
+    pub hs_token: String,
+    pub sender_localpart: String,
+    pub namespaces: Namespaces,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rate_limited: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub protocols: Option<Vec<String>>,
+    #[serde(rename = "de.sorunome.msc2409.push_ephemeral")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub receive_ephemeral: Option<bool>,
+    #[serde(rename = "org.matrix.msc3202")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub device_masquerading: Option<bool>,
+    #[serde(rename = "io.element.msc4190")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub device_management: Option<bool>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct Namespaces {
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub users: Vec<NamespaceEntry>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub aliases: Vec<NamespaceEntry>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub rooms: Vec<NamespaceEntry>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct NamespaceEntry {
+    pub exclusive: bool,
+    pub regex: String,
+}
+
 #[derive(Debug, Deserialize)]
 pub struct DeviceList {
     pub changed: Vec<String>,

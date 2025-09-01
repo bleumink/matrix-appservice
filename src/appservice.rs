@@ -12,7 +12,7 @@ use axum_extra::{
     headers::{Authorization, authorization::Bearer},
 };
 use matrix_sdk::ruma::{
-    OwnedTransactionId, OwnedUserId, RoomId,
+    OwnedTransactionId, OwnedUserId, RoomId, UserId,
     events::{
         AnySyncTimelineEvent,
         room::{
@@ -207,6 +207,38 @@ impl<S> ApplicationService<S> {
 
     pub async fn get_room(&self, room_id: &RoomId) -> Option<Arc<Room>> {
         self.inner.get_room(room_id).await
+    }
+
+    pub fn generate_registration(&self) -> Result<String> {
+        let mxid = UserId::parse(format!(
+            "@{}:{}",
+            &self.config().appservice.username,
+            &self.config().homeserver.server_name
+        ))?;
+
+        let registration = Registration {
+            id: self.config().appservice.id.clone(),
+            url: self.config().appservice.url.clone(),
+            as_token: self.config().appservice.as_token.clone(),
+            hs_token: self.config().appservice.hs_token.clone(),
+            sender_localpart: self.config().appservice.username.clone(),
+            rate_limited: Some(false),
+            protocols: None,
+            namespaces: Namespaces {
+                users: vec![NamespaceEntry {
+                    exclusive: true,
+                    regex: format!("^{}$", regex::escape(mxid.as_str())),
+                }],
+                aliases: vec![],
+                rooms: vec![],
+            },
+            receive_ephemeral: Some(true),
+            device_masquerading: Some(true),
+            device_management: Some(true),
+        };
+
+        let yaml = serde_yaml::to_string(&registration)?;
+        Ok(yaml)
     }
 
     pub fn get_user_fields<T>(&self) -> Result<T>
