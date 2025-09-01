@@ -2,7 +2,6 @@ mod appservice;
 
 pub mod exports {
     pub use matrix_sdk;
-    pub use serde_yaml;
 }
 
 pub use appservice::types::*;

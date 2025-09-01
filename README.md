@@ -20,7 +20,7 @@ experimental_features:
   msc3202_transaction_extensions: true
 ```
 
-The [appservice registration file](https://github.com/bleumink/matrix-appservice/blob/main/examples/registration.yaml) needs to following flags set:
+The [appservice registration file](examples/registration.yaml) needs to following flags set:
 ```yaml
 de.sorunome.msc2409.push_ephemeral: true
 org.matrix.msc3202: true
@@ -71,7 +71,7 @@ async fn on_room_member(
 }
 ```
 
-Example configuration file can be found [here](https://github.com/bleumink/matrix-appservice/blob/main/examples/config.yaml). Extra fields can be added to the configuration. These can be retrieved using the ```appservice.get_user_fields()``` method.
+Example configuration file can be found [here](examples/config.yaml). Extra fields can be added to the configuration. These can be retrieved using the ```appservice.get_user_fields()``` method.
 
 ## :construction: Work in progress
 This project is obviously not done; the following is on the to-do list:
@@ -83,3 +83,11 @@ This project is obviously not done; the following is on the to-do list:
 - [ ] Etc...
 
 Much of the project can also be deprecated by implementing the MSCs mentioned above in the Matrix Rust SDK to provide device masquerading support. I did not know enough about Rust when starting this project to make a sensible contribution there. Might revisit. You would still need to bring your own webserver and handle transactions.
+
+## License
+Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or
+[MIT license](LICENSE-MIT) at your option.
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall
+be dual licensed as above, without any additional terms or conditions.
