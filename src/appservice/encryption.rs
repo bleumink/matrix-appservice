@@ -258,7 +258,10 @@ impl Encryption {
         let request = self
             .client()?
             .request(http_request.method().clone(), http_request.uri().to_string())
-            .query(&[("org.matrix.msc3202.device_id", &self.device()?.id())])
+            .query(&[
+                ("org.matrix.msc3202.device_id", self.device()?.id().as_str()),
+                ("user_id", self.device()?.user()?.id().as_str()),                
+            ])
             .headers(http_request.headers().clone())
             .body(http_request.body().clone())
             .send()
