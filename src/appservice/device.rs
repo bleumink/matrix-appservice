@@ -103,9 +103,10 @@ impl Device {
         self.inner.token.lock().await.is_some()
     }
 
-    pub async fn register(&self, displayname: Option<String>) -> Result<Empty> {
+    pub async fn register(&self, displayname: Option<String>) -> Result<Empty> {        
         let user = self.user()?;
-
+        tracing::info!("Registering device {} for user {}", &self.id(), user.id());
+        
         let url = format!("/_matrix/client/v3/devices/{}", self.id());
         let body = CreateDeviceRequest {
             display_name: displayname,

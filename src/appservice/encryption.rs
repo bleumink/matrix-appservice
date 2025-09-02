@@ -178,7 +178,10 @@ impl Encryption {
             let response: reqwest::Response = self
                 .client()?
                 .put(url)
-                .query(&[("org.matrix.msc3202.device_id", self.device()?.id())])
+                .query(&[
+                    ("org.matrix.msc3202.device_id", self.device()?.id().as_str()),
+                    ("user_id", self.device()?.user()?.id().as_str()),
+                ])
                 .json(&body)
                 .send()
                 .await?;

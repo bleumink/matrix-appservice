@@ -91,8 +91,6 @@ impl User {
     }
 
     pub(crate) async fn populate_known_rooms(&self) -> Result<()> {
-        tracing::info!("Retrieving room membership of {}", &self.id());
-
         let joined_rooms = self.get_joined_rooms().await?;
         self.appservice()?
             .room_store()
@@ -110,6 +108,7 @@ impl User {
     }
 
     pub async fn get_joined_rooms(&self) -> Result<Vec<OwnedRoomId>> {
+        tracing::info!("Retrieving room membership of {}", &self.id());        
         let url = "/_matrix/client/v3/joined_rooms";
         let response = self
             .client()?
@@ -123,6 +122,7 @@ impl User {
     }
 
     pub async fn register(&self) -> Result<Empty> {
+        tracing::info!("Registering user {}", self.id());
         let url = "/_matrix/client/v3/register";
         let body = json!({
             "type": "m.login.application_service",
@@ -147,6 +147,7 @@ impl User {
     }
 
     pub async fn get_devices(&self) -> Result<Vec<matrix_sdk::ruma::api::client::device::Device>> {
+        tracing::info!("Fetching devices of user {}", self.id());
         let url = "/_matrix/client/v3/devices";
         let response = self.client()?.get(url).send().await?;
 
@@ -154,28 +155,29 @@ impl User {
     }
 
     pub async fn get_profile(&self) -> Result<Profile> {
+        tracing::info!("Fetching profile of user {}", self.id());
         let url = format!("/_matrix/client/v3/profile/{}", self.id());
         let response = self.client()?.get(&url).send().await?;
         parse_response(response).await
     }
 
     pub async fn set_displayname(&self, displayname: &str) -> Result<Empty> {
+        tracing::info!("Updating display name of {} to {}", self.id(), displayname);
         let url = format!("/_matrix/client/v3/profile/{}/displayname", self.id());
         let body = json!({"displayname": displayname});
         let response = self.client()?.put(&url).json(&body).send().await?;
-
-        tracing::info!("Updated display name of {} to {}", self.id(), displayname);
+        
         parse_response(response).await
     }
 
     pub async fn set_presence(&self, state: PresenceState, message: Option<String>) -> Result<Empty> {
+        tracing::debug!("Updating presence for {}", self.id());
         let url = format!("/_matrix/client/v3/presence/{}/status", self.id());
         let body = Presence {
             presence: state,
             status_msg: message,
         };
-        let response = self.client()?.put(&url).json(&body).send().await?;
-        tracing::debug!("Updated presence for {}", self.id());
+        let response = self.client()?.put(&url).json(&body).send().await?;        
         parse_response(response).await
     }
 }
