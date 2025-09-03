@@ -210,6 +210,9 @@ impl<S> ApplicationService<S> {
     }
 
     pub fn generate_registration(&self) -> Result<String> {
+        let mut appservice_url = self.config().appservice.url.clone();
+        appservice_url.set_port(Some(self.config().appservice.port))?;
+
         let mxid = UserId::parse(format!(
             "@{}:{}",
             &self.config().appservice.username,
@@ -218,7 +221,7 @@ impl<S> ApplicationService<S> {
 
         let registration = Registration {
             id: self.config().appservice.id.clone(),
-            url: self.config().appservice.url.clone(),
+            url: appservice_url,
             as_token: self.config().appservice.as_token.clone(),
             hs_token: self.config().appservice.hs_token.clone(),
             sender_localpart: self.config().appservice.username.clone(),

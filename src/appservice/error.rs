@@ -89,8 +89,14 @@ pub enum Error {
     #[error("Attempting to run multiple sync loops. This is not allowed: {0}")]
     MultipleSync(String),
 
-    #[error("Internal error: {0}")]
+    #[error("Unexpected error: {0}")]    
     Other(String),
+}
+
+impl From<()> for Error {
+    fn from(_: ()) -> Self {
+        Error::Other("Unit".to_string())
+    }
 }
 
 impl Error {
